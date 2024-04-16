@@ -1,0 +1,33 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CS149-asst1",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/wangdi/CS149/asst1/prog2_vecintrin/myexp",
+            // "args": ["../test/sql/p3.10-simple-join.slt", "--verbose", "-d"],
+            // "args": ["../test/sql/my-4-nested-loop.slt", "--verbose", "-d"],
+            "stopAtEntry": false,
+            "cwd": "/home/wangdi/CS149/asst1/prog2_vecintrin",
+            "environment": [
+                {
+                    "name": "OTHER_VALUE",
+                    "value": "Something something"
+                }
+            ],
+            "console": true,
+            "MIMode": "gdb",
+            /* "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ] */
+        }
+    ]
+}

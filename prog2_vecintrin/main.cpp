@@ -59,12 +59,15 @@ int main(int argc, char * argv[]) {
   float* output = new float[N+VECTOR_WIDTH];
   float* gold = new float[N+VECTOR_WIDTH];
   initValue(values, exponents, output, gold, N);
+  /* for (int i = 0; i < N + VECTOR_WIDTH; i++) {
+    printf("values[%d] = %f, exponents[%d] = %d\n", i, values[i], i, exponents[i]);
+  } */
 
   clampedExpSerial(values, exponents, gold, N);
   clampedExpVector(values, exponents, output, N);
 
-  //absSerial(values, gold, N);
-  //absVector(values, output, N);
+  // absSerial(values, gold, N);
+  // absVector(values, output, N);
 
   printf("\e[1;31mCLAMPED EXPONENT\e[0m (required) \n");
   bool clampedCorrect = verifyResult(values, exponents, output, gold, N);
@@ -249,7 +252,50 @@ void clampedExpVector(float* values, int* exponents, float* output, int N) {
   // Your solution should work for any value of
   // N and VECTOR_WIDTH, not just when VECTOR_WIDTH divides N
   //
+  __cs149_vec_float x;
+  __cs149_vec_float result;
+  __cs149_vec_int y;
+  __cs149_vec_int zero = _cs149_vset_int(0);
+  __cs149_vec_int ones = _cs149_vset_int(1);
+  __cs149_vec_float nine = _cs149_vset_float(9.999999f);
+  __cs149_mask maskAll, maskIsEqual0, maskIsNotEqual0, maskGreater9;
+
+  int i;
+  for (i = 0; i < N - (N % VECTOR_WIDTH); i += VECTOR_WIDTH) {
+    // All ones
+    maskAll = _cs149_init_ones();
+
+    _cs149_vload_float(x, values + i, maskAll);      // x = values[i]
+    _cs149_vload_int(y, exponents + i, maskAll);     // y = exponents[i]
+
+    _cs149_veq_int(maskIsEqual0, y, zero, maskAll);             // if exponent[i] == 0
+
+    _cs149_vset_float(result, 1.f, maskIsEqual0);               // result = 1
+
+    maskIsNotEqual0 = _cs149_mask_not(maskIsEqual0);              // else
+    _cs149_vload_float(result, values + i, maskIsNotEqual0);      // result = values[i]
+
+    _cs149_vsub_int(y, y, ones, maskIsNotEqual0);                 // y = y -1
+    _cs149_veq_int(maskIsEqual0, y, zero, maskIsNotEqual0);       // whether y != 0
+    maskIsNotEqual0 = _cs149_mask_not(maskIsEqual0);              // update maskIsNotEqual0
+
+    while (_cs149_cntbits(maskIsNotEqual0) > 0) {
+      _cs149_vmult_float(result, result, x, maskIsNotEqual0);     // result *= values
+
+      _cs149_vsub_int(y, y, ones, maskIsNotEqual0);               // y -= 1
+      _cs149_veq_int(maskIsEqual0, y, zero, maskIsNotEqual0);     // whether y != 0
+      maskIsNotEqual0 = _cs149_mask_not(maskIsEqual0);            // update maskIsNotEqual0
+    }
+
+    _cs149_vgt_float(maskGreater9, result, nine, maskAll);  // if result > 9.9
+    _cs149_vset_float(result, 9.999999f, maskGreater9);     // result = 9.9
+    
+    _cs149_vstore_float(output + i, result, maskAll);
+  }
   
+  for (int j = i; j < N; j++) {
+    clampedExpSerial(values + j, exponents + j, output + j, 1);
+  }
 }
 
 // returns the sum of all elements in values

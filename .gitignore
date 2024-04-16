@@ -1,3 +1,7 @@
 *.ppm
+*.o
 objs/
 mandelbrot
+myexp
+.vscode/*
+!.vscode/launch.json
