@@ -59,9 +59,9 @@ int main(int argc, char * argv[]) {
   float* output = new float[N+VECTOR_WIDTH];
   float* gold = new float[N+VECTOR_WIDTH];
   initValue(values, exponents, output, gold, N);
-  /* for (int i = 0; i < N + VECTOR_WIDTH; i++) {
+  for (int i = 0; i < N; i++) {
     printf("values[%d] = %f, exponents[%d] = %d\n", i, values[i], i, exponents[i]);
-  } */
+  }
 
   clampedExpSerial(values, exponents, gold, N);
   clampedExpVector(values, exponents, output, N);
@@ -316,11 +316,27 @@ float arraySumVector(float* values, int N) {
   //
   // CS149 STUDENTS TODO: Implement your vectorized version of arraySumSerial here
   //
-  
-  for (int i=0; i<N; i+=VECTOR_WIDTH) {
+  __cs149_mask maskAll = _cs149_init_ones();
+  __cs149_vec_float x;
+  __cs149_vec_float result = _cs149_vset_float(0);
 
+  int i;
+  for (i = 0; i < N; i+=VECTOR_WIDTH) {
+    _cs149_vload_float(x, values + i, maskAll);
+    _cs149_vadd_float(result, result, x, maskAll);
   }
 
-  return 0.0;
+  for (int j = 1; j < VECTOR_WIDTH; j *= 2) {
+    _cs149_hadd_float(result, result);
+    _cs149_interleave_float(result, result);
+  }
+  
+  float *temp = new float[VECTOR_WIDTH];
+  _cs149_vstore_float(temp, result, maskAll);
+  float sum = temp[0];
+
+  delete[] temp;
+
+  return sum;
 }
 
