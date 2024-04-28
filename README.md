@@ -174,8 +174,8 @@ greater than that of the original sequential Mandelbrot implementation from
 
 When reading ISPC code, you must keep in mind that although the code appears
 much like C/C++ code, the ISPC execution model differs from that of standard
-C/C++. In contrast to C, multiple program instances of an ISPC program are
-always executed in parallel on the CPU's SIMD execution units. The number of
+C/C++. __In contrast to C, multiple program instances of an ISPC program are
+always executed in parallel on the CPU's SIMD execution units__. The number of
 program instances executed simultaneously is determined by the compiler (and
 chosen specifically for the underlying machine). This number of concurrent
 instances is available to the ISPC programmer via the built-in variable
@@ -184,6 +184,9 @@ the built-in `programIndex`. Thus, a call from C code to an ISPC function can
 be thought of as spawning a group of concurrent ISPC program instances
 (referred to in the ISPC documentation as a gang). The gang of instances
 runs to completion, then control returns back to the calling C code.
+
+**my_note**: Note that all of the exposition up until now has been related to harvesting the available parallelism from the SIMD unit in a single CPU core.(from <https://ispc.github.io/example.html>)
+
 
 __Stop. This is your friendly instructor. Please read the preceding paragraph again. Trust me.__
 
@@ -343,6 +346,9 @@ Note: This problem is a review to double-check your understanding, as it covers 
   single CPU core (no tasks) and when using all cores (with tasks). What 
   is the speedup due to SIMD parallelization? What is the speedup due to 
   multi-core parallelization?
+
+    my answer: 3.93x speedup for single CPU core; 44.86x speedup for multi-core
+
 2.  Modify the contents of the array values to improve the relative speedup 
   of the ISPC implementations. Construct a specifc input that __maximizes speedup over the sequential version of the code__ and report the resulting speedup achieved (for both the with- and without-tasks ISPC implementations). Does your modification improve SIMD speedup?
   Does it improve multi-core speedup (i.e., the benefit of moving from ISPC without-tasks to ISPC with tasks)? Please explain why.
